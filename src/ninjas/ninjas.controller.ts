@@ -2,22 +2,29 @@ import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { handleValidationErrorOnController } from 'src/_common/validation';
 import { v4 } from 'uuid';
 import { createNinjaDtoSchema } from './ninjas.dto';
-
-const allNinjas = [
-  { id: 'id1', name: 'rob', type: 'strong' },
-  { id: 'id2', name: 'lizzie', type: 'fast' },
-];
+import { NinjasService } from './ninjas.service';
 
 @Controller('ninjas')
 export class NinjasController {
+  constructor(private readonly ninjasService: NinjasService) {}
+
   @Get()
-  getNinjas(@Query('type') type: string) {
-    return !type ? allNinjas : allNinjas.filter((x) => x.type === type);
+  getNinjas(
+    @Query('id') id?: string,
+    @Query('name') name?: string,
+    @Query('type') type?: string,
+  ) {
+    const service = new NinjasService();
+
+    return id || type || name
+      ? service.getFilteredNinjas({ id, type, name })
+      : service.getAllNinjas();
   }
 
   @Get(':id')
   getNinjaById(@Param('id') id: string) {
-    return { id };
+    const service = new NinjasService();
+    return service.getFilteredNinjas({ id });
   }
 
   @Post()
@@ -27,7 +34,8 @@ export class NinjasController {
       return handleValidationErrorOnController(parsed.error.errors);
 
     const newNinja = { ...parsed.data, id: v4() };
-    allNinjas.push(newNinja);
+
+    // allNinjas.push(newNinja);
 
     return newNinja;
   }
