@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { ninjaSchema } from './ninjas.dto';
-import { z } from 'zod';
+import { TNinja } from './ninjas.types';
 
 type Ninjas = {
   id: string;
@@ -22,14 +21,14 @@ export class NinjasService {
     return this.ninjas;
   }
 
-  getFilteredNinjas(initProps: Partial<z.infer<typeof ninjaSchema>>) {
-    const props = {
-      ...(initProps.id ? { id: initProps.id } : {}),
-      ...(initProps.type ? { type: initProps.type } : {}),
-      ...(initProps.name ? { name: initProps.name } : {}),
-    };
+  getFilteredNinjas(initProps: Partial<TNinja>) {
+    const props = {} as Partial<TNinja>;
+    for (const k in initProps) {
+      const key = k as keyof TNinja;
+      if (initProps[key] !== undefined) props[key] = initProps[key];
+    }
+
     const keys = Object.keys(props) as (keyof typeof props)[];
-    console.log(`ninjas.service.ts:${/*LL*/ 27}`, { props, keys });
 
     return keys.length === 0
       ? this.ninjas

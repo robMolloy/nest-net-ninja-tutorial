@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { handleValidationErrorOnController } from 'src/_common/validation';
 import { v4 } from 'uuid';
-import { createNinjaDtoSchema } from './ninjas.dto';
+import { createNinjaDtoSchema } from './ninjas.types';
 import { NinjasService } from './ninjas.service';
 
 @Controller('ninjas')
